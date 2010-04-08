@@ -1,10 +1,9 @@
-module ProductsControllerOverride
-  def self.included(target)
-    target.class_eval do
-      before_filter :define_2d_option_matrix, :only => :show 
-    end
+module Spree::ProductOptions::ProductsController
+  def self.included(controller)
+    controller.append_before_filter :define_2d_option_matrix, :only => :show 
   end
   def define_2d_option_matrix
+logger.warn "steph inside here!"
     variants = Spree::Config[:show_zero_stock_products] ?
       object.variants.active.select { |a| !a.option_values.empty? } :
       object.variants.active.select { |a| !a.option_values.empty? && a.in_stock }
@@ -14,6 +13,7 @@ module ProductsControllerOverride
     variant_ids = {}
     sizes = []
     colors = []
+logger.warn "steph inside here! 1"
     variants.each do |variant|
       active_size = variant.option_values.select { |a| a.option_type.presentation == 'PO_Size' }.first
       active_color = variant.option_values.select { |a| a.option_type.presentation == 'PO_Color' }.first
@@ -21,7 +21,7 @@ module ProductsControllerOverride
       sizes << active_size
       colors << active_color
     end
-    size_sort = Hash['S', 0, 'M', 1, 'L', 2]
+    size_sort = Hash['S', 0, 'M', 1, 'L', 2, 'XL', 3]
     @sc_matrix = { 'sizes' => sizes.sort_by { |s| size_sort[s.presentation] }.uniq,
         'colors' => colors.uniq,
         'variant_ids' => variant_ids }

@@ -1,9 +1,3 @@
-<% content_for :head do -%>
-<%= javascript_include_tag 'product' %>
-<% end -%>
-
-<% if @product.has_stock? || Spree::Config[:allow_backorders] %>
-<% form_for :order, :url => orders_url do |f| %>
 <% if @sc_matrix -%>
 <p>Choose your colour, size and quantity below.</p>
 <table id="option-matrix">
@@ -30,7 +24,8 @@
 	</tr>
 	<% end -%>
 </table>
-<% elsif @product.has_variants? %>
+<% else -%>
+  <% if @product.has_variants? %>
     <div id="product-variants">
       <h2><%= t('variants') %></h2>
       <ul>
@@ -53,22 +48,16 @@
         <% end%>
       </ul>
     </div>
-<% end%>
-
-
-<% if product_price(@product) %>
-<p class="prices">
-	<%= t("price") %>
-	  <br />
-	  <span class="price selling"><%= product_price(@product) %></span>
-	</p>
-<% end %>
-<%= text_field_tag (@product.has_variants? ? :quantity : "variants[#{@product.master.id}]"), 1, :class => "title", :size => 3 %>
-	
-<button type='submit' class='large primary'>
-	<%= image_tag('/images/add-to-cart.png') + t('add_to_cart') %>
-</button>
+  <% end%>
 <% end -%>
+
+<% if @product.has_stock? || Spree::Config[:allow_backorders] %>
+  <%= text_field_tag (@product.has_variants? ? :quantity : "variants[#{@product.master.id}]"),
+    1, :class => "title", :size => 3 %>
+  &nbsp;
+  <button type='submit' class='large primary'>
+    <%= image_tag('/images/add-to-cart.png') + t('add_to_cart') %>
+  </button>
 <% else %>
-<%= content_tag('strong', t('out_of_stock')) %>
-<% end -%>
+  <%= content_tag('strong', t('out_of_stock')) %>
+<% end %>
